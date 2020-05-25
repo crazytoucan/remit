@@ -5,10 +5,15 @@
   "scripts": {
     "build": "yarn build:commonjs && yarn build:esm",
     "build:commonjs": "tsc",
-    "build:esm": "tsc -p tsconfig-esm.json"
+    "build:esm": "tsc -p tsconfig-esm.json",
+    "lint": "tslint --project tsconfig.json",
+    "test": "exit 0"
   },
   "license": "MIT",
   "devDependencies": {
+    "prettier": "^2.0.5",
+    "tslint": "^6.1.2",
+    "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.3"
   }
 }

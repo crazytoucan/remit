@@ -36,7 +36,7 @@ export class Emitter implements IEmitter {
   }
 
   public off<T>(type: IActionType<T>, handler: (payload: T) => void) {
-    let chain = this.chains.get(type);
+    const chain = this.chains.get(type);
     if (chain !== undefined) {
       chain.remove(handler);
     }
