@@ -24,3 +24,10 @@ export interface IEmitter {
   on<T>(type: IActionType<T>, handler: (payload: T) => void): void;
   off<T>(type: IActionType<T>, handler: (payload: T) => void): void;
 }
+
+export interface IViewStore<S> {
+  getState(): S;
+  setState(nextState: S): void;
+  subscribe(cb: () => void): () => void;
+  flush(): void;
+}

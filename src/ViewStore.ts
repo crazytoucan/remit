@@ -1,8 +1,8 @@
-import { IAction } from "./types";
+import { IAction, IViewStore } from "./types";
 import { Chain } from "./utils/Chain";
 import { defer } from "./utils/defer";
 
-export class ViewStore<S> {
+export class ViewStore<S> implements IViewStore<S> {
   private chain = new Chain();
 
   public constructor(public state: S, public dispatch: (action: IAction) => void) {}
