@@ -1,3 +1,5 @@
-# remit
+# remission
 
-Early prototype project for an alternative state update loop to the standard Redux-Saga stack.
+Simple state update infrastructure for modern React apps.
+Allows both copy-on-write stores as used by React-Redux and mutable stores for computationally intensive desktop applications.
+No generators.
