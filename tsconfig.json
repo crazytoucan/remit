@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "declaration": false,
+    "importHelpers": true,
+    "jsx": "react",
+    "lib": ["dom", "es2015"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "outDir": "lib",
+    "strict": true,
+    "target": "ES2015"
+  },
+  "exclude": ["node_modules", "lib"]
+}

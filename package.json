@@ -1,0 +1,9 @@
+{
+  "name": "remit",
+  "version": "0.0.0",
+  "main": "index.js",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "tslib": "^1.6.1"
+  }
+}
