@@ -1,4 +1,4 @@
-import { IActionType, IAction } from "./types";
+import { IActionType } from "./types";
 import { Chain } from "./utils/Chain";
 
 interface IDispatchNode {
@@ -23,10 +23,6 @@ export class Emitter {
     } else {
       this.drain(type, payload);
     }
-  }
-
-  public dispatch = (action: IAction) => {
-    this.emit(action.type as IActionType<any>, action.payload);
   }
 
   public on<T>(type: IActionType<T>, handler: (payload: T) => void) {

@@ -16,3 +16,11 @@ export type IActionDefinition<T> = {
 export type IActionType<T> = string & {
   __payload: T;
 };
+
+export interface IEmitter {
+  emit(type: IActionType<undefined>): void;
+  emit<T>(type: IActionType<T>, payload: T): void;
+
+  on<T>(type: IActionType<T>, handler: (payload: T) => void): void;
+  off<T>(type: IActionType<T>, handler: (payload: T) => void): void;
+}
