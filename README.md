@@ -1,3 +1,5 @@
+[![](https://img.shields.io/circleci/build/github/crazytoucan/remission)](https://app.circleci.com/pipelines/github/crazytoucan/remission?branch=master)
+
 # remission
 
 Simple state update infrastructure for modern React apps.
