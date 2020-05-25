@@ -1,4 +1,4 @@
 export { Emitter } from "./Emitter";
-export { createAction, defineAction, once, take } from "./functions";
-export { Store } from "./Store";
+export { defineAction, once, take } from "./functions";
 export { IAction, IActionType } from "./types";
+export { ViewStore } from "./ViewStore";

@@ -25,7 +25,7 @@ export class Emitter {
     }
   }
 
-  public dispatch(action: IAction) {
+  public dispatch = (action: IAction) => {
     this.emit(action.type as IActionType<any>, action.payload);
   }
 
@@ -37,9 +37,13 @@ export class Emitter {
     }
 
     chain.add(handler);
-    return () => {
-      chain!.remove(handler);
-    };
+  }
+
+  public off<T>(type: IActionType<T>, handler: (payload: T) => void) {
+    let chain = this.chains.get(type);
+    if (chain !== undefined) {
+      chain.remove(handler);
+    }
   }
 
   private drain(type: string, payload: any) {
