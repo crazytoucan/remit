@@ -1,15 +1,15 @@
 import { Emitter } from "./Emitter";
-import { IAction, IMessageChannel } from "./types";
+import { IAction, IActionType } from "./types";
 
-export function channel<T>(str: string) {
-  return (str as unknown) as IMessageChannel<T>;
+export function defineAction<T>(str: string) {
+  return (str as unknown) as IActionType<T>;
 }
 
-export function createAction<T>(type: IMessageChannel<T>, payload: T): IAction {
+export function createAction<T>(type: IActionType<T>, payload: T): IAction {
   return { type, payload };
 }
 
-export function once<T>(emitter: Emitter, type: IMessageChannel<T>, cb: (t: T) => void) {
+export function once<T>(emitter: Emitter, type: IActionType<T>, cb: (t: T) => void) {
   const handler = (value: T) => {
     destroy();
     cb(value);
@@ -19,13 +19,13 @@ export function once<T>(emitter: Emitter, type: IMessageChannel<T>, cb: (t: T) =
   return destroy;
 }
 
-export function take<T>(emitter: Emitter, type: IMessageChannel<T>): Promise<T>;
+export function take<T>(emitter: Emitter, type: IActionType<T>): Promise<T>;
 export function take<T>(
   emitter: Emitter,
-  type: IMessageChannel<T>,
+  type: IActionType<T>,
   maxWait: number,
 ): Promise<T | null>;
-export function take<T>(emitter: Emitter, type: IMessageChannel<T>, maxWait?: number) {
+export function take<T>(emitter: Emitter, type: IActionType<T>, maxWait?: number) {
   return new Promise<T | null>((resolve) => {
     let handle = 0;
     if (maxWait !== undefined) {

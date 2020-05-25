@@ -2,8 +2,13 @@
   "name": "remit",
   "version": "0.0.0",
   "main": "index.js",
-  "license": "UNLICENSED",
-  "dependencies": {
-    "tslib": "^1.6.1"
+  "scripts": {
+    "build": "yarn build:commonjs && yarn build:esm",
+    "build:commonjs": "tsc",
+    "build:esm": "tsc -p tsconfig-esm.json"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^3.9.3"
   }
 }

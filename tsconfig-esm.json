@@ -4,15 +4,14 @@
     "importHelpers": true,
     "jsx": "react",
     "lib": ["dom", "es2015"],
-    "module": "commonjs",
-
+    "module": "ES2020",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "outDir": "lib",
+    "outDir": "esm",
     "strict": true,
-    "target": "ES2015"
+    "target": "ES2017"
   },
   "exclude": ["node_modules", "lib", "esm"]
 }

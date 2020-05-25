@@ -4,6 +4,6 @@ export interface IAction {
   [key: string]: unknown;
 }
 
-export type IMessageChannel<T> = string & {
+export type IActionType<T> = string & {
   __payload: T;
 };

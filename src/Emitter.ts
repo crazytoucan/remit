@@ -1,4 +1,4 @@
-import { IMessageChannel } from "./types";
+import { IActionType, IAction } from "./types";
 import { Chain } from "./utils/Chain";
 
 interface IDispatchNode {
@@ -11,8 +11,8 @@ export class Emitter {
   private chains = new Map<string, Chain>();
   private end: IDispatchNode | null = null;
 
-  public emit(type: IMessageChannel<undefined>): void;
-  public emit<T>(type: IMessageChannel<T>, payload: T): void;
+  public emit(type: IActionType<undefined>): void;
+  public emit<T>(type: IActionType<T>, payload: T): void;
   public emit(type: string, payload?: any) {
     if (this.end !== null) {
       this.end = this.end.next = {
@@ -25,7 +25,11 @@ export class Emitter {
     }
   }
 
-  public on<T>(type: IMessageChannel<T>, handler: (payload: T) => void) {
+  public dispatch(action: IAction) {
+    this.emit(action.type as IActionType<any>, action.payload);
+  }
+
+  public on<T>(type: IActionType<T>, handler: (payload: T) => void) {
     let chain = this.chains.get(type);
     if (chain === undefined) {
       chain = new Chain();
