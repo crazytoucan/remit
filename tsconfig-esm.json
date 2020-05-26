@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "declaration": false,
+    "declaration": true,
     "importHelpers": true,
     "jsx": "react",
     "lib": ["dom", "es2015"],
