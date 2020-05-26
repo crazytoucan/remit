@@ -1,4 +1,5 @@
+export { defineAction } from "./defineAction";
+export { off, on, once, take } from "./effects";
 export { Emitter } from "./Emitter";
-export { defineAction, off, on, once, take } from "./functions";
-export { IAction, IActionDefinition, IActionType, IEmitter, IStore } from "./types";
 export { Store } from "./Store";
+export { IAction, IActionDefinition, IActionType, IEmitter, IStore } from "./types";
