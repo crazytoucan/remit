@@ -1,4 +1,4 @@
-import { IActionType, IEmitter } from "./types";
+import { IAction, IActionType, IEmitter } from "./types";
 import { Chain } from "./utils/Chain";
 
 interface IDispatchNode {
@@ -11,17 +11,13 @@ export class Emitter implements IEmitter {
   private chains = new Map<string, Chain>();
   private end: IDispatchNode | null = null;
 
-  public emit(type: IActionType<undefined>): void;
-  public emit<T>(type: IActionType<T>, payload: T): void;
-  public emit(type: string, payload?: any) {
+  public emit({ type, payload }: IAction) {
+    const next: IDispatchNode = { type, payload, next: null };
     if (this.end !== null) {
-      this.end = this.end.next = {
-        type,
-        payload,
-        next: null,
-      };
+      this.end = this.end.next = next;
     } else {
-      this.drain(type, payload);
+      this.end = next;
+      this.drain();
     }
   }
 
@@ -42,12 +38,12 @@ export class Emitter implements IEmitter {
     }
   }
 
-  private drain(type: string, payload: any) {
-    let node: IDispatchNode | null = (this.end = { type, payload, next: null });
+  private drain() {
+    let node: IDispatchNode | null = this.end;
     while (node !== null) {
       const chain = this.chains.get(node.type);
       if (chain !== undefined) {
-        chain.emit(payload);
+        chain.emit(node.payload);
       }
 
       node = node.next;
