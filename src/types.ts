@@ -18,7 +18,7 @@ export type IActionType<T> = string & {
 };
 
 export interface IEmitter {
-  emit(action: IAction): void;
+  put(action: IAction): void;
   on<T>(type: IActionType<T>, handler: (payload: T) => void): void;
   off<T>(type: IActionType<T>, handler: (payload: T) => void): void;
 }

@@ -11,7 +11,7 @@ export class Emitter implements IEmitter {
   private chains = new Map<string, Chain>();
   private end: IDispatchNode | null = null;
 
-  public emit({ type, payload }: IAction) {
+  public put({ type, payload }: IAction) {
     const next: IDispatchNode = { type, payload, next: null };
     if (this.end !== null) {
       this.end = this.end.next = next;

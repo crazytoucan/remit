@@ -1,4 +1,4 @@
-import { IActionType, IEmitter } from "./types";
+import { IAction, IActionType, IEmitter } from "./types";
 
 export function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
   return emitter.on(type, cb);
@@ -36,4 +36,8 @@ export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: numbe
 
     const handle = maxWait !== undefined ? setTimeout(o.cancel, maxWait) : 0;
   });
+}
+
+export function put(emitter: IEmitter, action: IAction) {
+  emitter.put(action);
 }
