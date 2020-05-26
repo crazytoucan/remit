@@ -26,6 +26,10 @@ export class Chain {
   private nextChain: IHandler[] | null = null;
 
   public emit(payload: any) {
+    if (this.dispatching) {
+      throw new Error("emit() when already emitting");
+    }
+
     this.dispatching = true;
     const chain = this.chain;
     for (let i = 0; i < chain.length; i++) {
