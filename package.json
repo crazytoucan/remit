@@ -8,8 +8,10 @@
     "build": "yarn build:commonjs && yarn build:esm",
     "build:commonjs": "tsc",
     "build:esm": "tsc -p tsconfig-esm.json",
+    "clean": "rm -rf esm lib",
     "lint": "tslint --project tsconfig.json",
-    "test": "exit 0"
+    "test": "exit 0",
+    "prepack": "yarn clean && yarn build"
   },
   "license": "MIT",
   "devDependencies": {
