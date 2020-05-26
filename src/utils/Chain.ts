@@ -25,7 +25,7 @@ export class Chain {
   private chain: IHandler[] = [];
   private nextChain: IHandler[] | null = null;
 
-  emit(payload: any) {
+  public emit(payload: any) {
     this.dispatching = true;
     const chain = this.chain;
     for (let i = 0; i < chain.length; i++) {
@@ -39,7 +39,7 @@ export class Chain {
     this.dispatching = false;
   }
 
-  add(handler: IHandler) {
+  public add(handler: IHandler) {
     if (this.dispatching) {
       if (this.nextChain === null) {
         this.nextChain = [...this.chain, handler];
@@ -51,7 +51,7 @@ export class Chain {
     }
   }
 
-  remove(handler: IHandler) {
+  public remove(handler: IHandler) {
     if (this.dispatching) {
       if (this.nextChain === null) {
         this.nextChain = [...this.chain];

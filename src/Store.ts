@@ -5,7 +5,7 @@ import { defer } from "./utils/defer";
 export class Store<S> implements IStore<S> {
   private chain = new Chain();
 
-  public constructor(public state: S, public dispatch: (action: IAction) => void) {}
+  constructor(public state: S, public dispatch: (action: IAction) => void) {}
   public getState() {
     return this.state;
   }
