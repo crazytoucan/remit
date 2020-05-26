@@ -1,7 +1,9 @@
 {
   "name": "remission",
   "version": "0.0.0",
-  "main": "index.js",
+  "main": "lib/index.js",
+  "module": "esm/index.js",
+  "typings": "esm/index.js",
   "scripts": {
     "build": "yarn build:commonjs && yarn build:esm",
     "build:commonjs": "tsc",
