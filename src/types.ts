@@ -23,7 +23,7 @@ export interface IEmitter {
   off<T>(type: IActionType<T>, handler: (payload: T) => void): void;
 }
 
-export interface IViewStore<S> {
+export interface IStore<S> {
   readonly state: S;
 
   getState(): S;
