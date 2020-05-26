@@ -18,14 +18,14 @@ export type IActionType<T> = string & {
 };
 
 export interface IEmitter {
-  emit(type: IActionType<undefined>): void;
-  emit<T>(type: IActionType<T>, payload: T): void;
-
+  emit(action: IAction): void;
   on<T>(type: IActionType<T>, handler: (payload: T) => void): void;
   off<T>(type: IActionType<T>, handler: (payload: T) => void): void;
 }
 
 export interface IViewStore<S> {
+  readonly state: S;
+
   getState(): S;
   setState(nextState: S): void;
   subscribe(cb: () => void): () => void;
