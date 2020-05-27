@@ -27,5 +27,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/crazytoucan/tinysaga.git"
-  }
+  },
+  "keywords": [
+    "javascript",
+    "redux",
+    "middleware",
+    "saga",
+    "effects",
+    "side effects",
+    "actions"
+  ]
 }
