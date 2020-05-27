@@ -101,16 +101,16 @@ export interface IStore<S> {
   readonly state: S;
 
   /**
-   * The state of the store as a getter function, required for React-Redux integration.
-   */
-  getState(): S;
-
-  /**
    * Directly sets the new state of the store. If this state reference is different from the old one,
    * listeners will be notified on the next tick. If you'd like to notify listeners sooner (e.g. to
    * _synchronously_ repaint your UI), use store.flush() immediately after store.setState().
    */
   setState(nextState: S): void;
+
+  /**
+   * The state of the store as a getter function, required for React-Redux integration.
+   */
+  getState(): S;
 
   /**
    * Subscribes to changes from this store, required for React-Redux integrations. Applications

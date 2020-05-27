@@ -37,6 +37,39 @@ At its core, Tinysaga is really just an event bus that integrates into React-Red
 
 There are a set of helpful Effects that Tinysaga exports, such as `take()` and `once()` which allow you to compose the low-level Emitter primitive into more powerful constructs. No generators involved.
 
+## API
+
+```ts
+// Utility function for defining typesafe actions.
+function defineAction<T = undefined>(type: string): IActionDefinition<T>;
+
+// The core Emitter type to use with Tinysaga for handling actions.
+class Emitter {
+  put(action: IAction): void;
+  on<T>(type: IActionType<T>, handler: (payload: T) => void): () => void;
+}
+
+// A Store class to use with Tinysaga. No redux or reducers required --
+// just set the Store's state directly from your Tinysaga handlers.
+class Store<S> implements IStore<S> {
+  constructor(state: S, dispatch: (action: IAction) => void);
+
+  readonly state: S;
+  setState(nextState: S): void;
+  getState(): S;
+  dispatch(action: IAction): void
+  subscribe(cb: () => void): () => void;
+  flush(): void;
+}
+
+// Effects to use for convenience in Tinysaga handlers.
+function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void): () => void;
+function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void): () => void;
+function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>
+function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait: number): Promise<T | null>;
+function put(emitter: IEmitter, action: IAction): void;
+```
+
 ## Examples
 
 ### Making a network call
@@ -110,3 +143,10 @@ function* popoverSaga() {
   });
 }
 ```
+
+## Contributing
+
+Contributions are definitely welcome!
+
+This is still an early-stage project,
+so the most likely next major investment will be a documentation site.
