@@ -7,6 +7,14 @@ Simple state update pattern for modern React apps.
 Allows for updating both immutable state as used by React-Redux and mutable state for computationally intensive desktop applications.
 No generators.
 
+## Installation
+
+```sh
+$ yarn add tinysaga
+```
+
+Comes with TypeScript typings out of the box, as well as ESM support and tree shaking.
+
 ## Motivation
 
 Redux-Saga is a great library which allows applications to manage the complex state updates and side effects that happen in many React-Redux applications. It is a crucial part of the current frontend software stack.
