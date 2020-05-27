@@ -37,6 +37,16 @@ export function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => v
  * @param type the action type to listen on
  */
 export function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>;
+
+/**
+ * Returns a promise whose resolved value will be the next action of the given type
+ * emitted on the emitter. If the `maxWait` parameter is specified, then at most
+ * `maxWait` milliseconds will be waited before returning the default value `null`.
+ *
+ * @param emitter emitter to hook into
+ * @param type the action type to listen on
+ * @param maxWait the maximum time, in millis, to wait for the given action type
+ */
 export function take<T>(
   emitter: IEmitter,
   type: IActionType<T>,
