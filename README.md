@@ -3,8 +3,8 @@
 
 # tinysaga
 
-Simple state update infrastructure for modern React apps.
-Allows both copy-on-write stores as used by React-Redux and mutable stores for computationally intensive desktop applications.
+Simple state update pattern for modern React apps.
+Allows for updating both immutable state as used by React-Redux and mutable state for computationally intensive desktop applications.
 No generators.
 
 More documentation coming soon.
