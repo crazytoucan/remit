@@ -20,7 +20,7 @@ export interface IAction {
 
 /**
  * This class is a typesafe wrapper for creating Actions. Using `defineAction()`, consumers can
- * create typesafe paylods by invoking the definition as a function.
+ * create typesafe payloads by invoking the definition as a function.
  *
  * ```
  * const LoadUser = defineAction<{ id: string }>("LoadUser");
