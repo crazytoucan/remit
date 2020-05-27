@@ -59,6 +59,8 @@ on(emitter, FetchUser.TYPE, async ({ userId }) => {
 
 ### Closing a popover unless the user mouses into it or its anchor
 
+This snippet shows how multiple action types can be combined to implement complex behavior. Here we use `lodash.debounce()` for most of the heavy lifting.
+
 ```ts
 const DismissPopover = defineAction("DismissPopover");
 const PopoverAnchorEnter = defineAction("PopoverAnchorEnter");
@@ -79,6 +81,32 @@ function popoverHandler(emitter: IEmitter) {
 
   on(emitter, PopoverEnter.TYPE, () => {
     debouncedHide.cancel();
+  });
+}
+```
+
+For comparison, equivalent Redux-Saga code is something like:
+
+```ts
+const DismissPopover = defineAction("DismissPopover");
+const PopoverAnchorEnter = defineAction("PopoverAnchorEnter");
+const PopoverEnter = defineAction("PopoverEnter");
+
+function popoverSaga() {
+  yield fork(function* () {
+    while (true) {
+      yield takeLatest(DismissPopover.TYPE, function* () {
+        const { pass } = yield race({
+          anchorEnter: take(PopoverAnchorEnter.TYPE),
+          enter: take(PopoverEnter.TYPE),
+          pass: delay(500),
+        });
+
+        if (pass) {
+          yield put(DismissPopoverInternal()); // goes off to a reducer somewhere
+        }
+      };
+    }
   });
 }
 ```
