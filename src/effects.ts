@@ -1,4 +1,4 @@
-import { IAction, IActionType, ICancelable, IEmitter } from "./types";
+import { IAction, IActionType, IEmitter } from "./types";
 
 /**
  * Equivalent to `emitter.on()`, exported as an Effect for consistency.
@@ -44,7 +44,7 @@ export function take<T>(
 ): Promise<T | null>;
 export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: number) {
   return new Promise<T | null>((resolve) => {
-    const o = once(emitter, type, (value) => {
+    const unsubscribe = once(emitter, type, (value) => {
       if (handle !== 0) {
         clearTimeout(handle);
       }
@@ -52,7 +52,7 @@ export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: numbe
       resolve(value);
     });
 
-    const handle = maxWait !== undefined ? setTimeout(o.cancel, maxWait) : 0;
+    const handle = maxWait !== undefined ? setTimeout(unsubscribe, maxWait) : 0;
   });
 }
 
