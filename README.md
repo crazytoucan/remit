@@ -92,7 +92,7 @@ const DismissPopover = defineAction("DismissPopover");
 const PopoverAnchorEnter = defineAction("PopoverAnchorEnter");
 const PopoverEnter = defineAction("PopoverEnter");
 
-function popoverSaga() {
+function* popoverSaga() {
   yield fork(function* () {
     while (true) {
       yield takeLatest(DismissPopover.TYPE, function* () {
