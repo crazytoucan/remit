@@ -1,23 +1,41 @@
-import { IAction, IActionType, IEmitter } from "./types";
+import { IAction, IActionType, ICancelable, IEmitter } from "./types";
 
+/**
+ * Equivalent to `emitter.on()`, exported as an Effect for consistency.
+ *
+ * @param emitter the emitter to hook into
+ * @param type the action type to listen on
+ * @param cb a callback called whenever the action is emitted
+ */
 export function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
   return emitter.on(type, cb);
 }
 
-export function off<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
-  return emitter.off(type, cb);
-}
-
+/**
+ * Listens for `emitter.on()`, invokes the callback exactly once, and then unlistens.
+ * Returns a handle which, when called, cancels this effect.
+ *
+ * @param emitter the emitter to hook into
+ * @param type the action type to listen on
+ * @param cb a callback called exactly once when the next action is emitted
+ */
 export function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
-  const handler = (value: T) => {
-    emitter.off(type, handler);
+  const destroy = emitter.on(type, (value: T) => {
+    destroy();
     cb(value);
-  };
+  });
 
-  emitter.on(type, handler);
-  return { cancel: () => emitter.off(type, handler) };
+  return destroy;
 }
 
+/**
+ * Returns a promise whose resolved value will be the next action of the given type
+ * emitted on the emitter. If the `maxWait` parameter is specified, then at most
+ * `maxWait` milliseconds will be waited before returning the default value `null`.
+ *
+ * @param emitter emitter to hook into
+ * @param type the action type to listen on
+ */
 export function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>;
 export function take<T>(
   emitter: IEmitter,
@@ -38,6 +56,13 @@ export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: numbe
   });
 }
 
+/**
+ *
+ * Equivalent to `emitter.put()`, exported as an Effect for consistency.
+ *
+ * @param emitter the emitter to use
+ * @param action the action to emit
+ */
 export function put(emitter: IEmitter, action: IAction) {
   emitter.put(action);
 }

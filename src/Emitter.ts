@@ -11,8 +11,8 @@ export class Emitter implements IEmitter {
   private chains = new Map<string, Chain>();
   private end: IDispatchNode | null = null;
 
-  public put({ type, payload }: IAction) {
-    const next: IDispatchNode = { type, payload, next: null };
+  public put(action: IAction) {
+    const next: IDispatchNode = { type: action.type, payload: action.payload, next: null };
     if (this.end !== null) {
       this.end = this.end.next = next;
     } else {
@@ -29,13 +29,9 @@ export class Emitter implements IEmitter {
     }
 
     chain.add(handler);
-  }
-
-  public off<T>(type: IActionType<T>, handler: (payload: T) => void) {
-    const chain = this.chains.get(type);
-    if (chain !== undefined) {
-      chain.remove(handler);
-    }
+    return () => {
+      chain!.remove(handler);
+    };
   }
 
   private drain() {
