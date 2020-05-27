@@ -5,6 +5,12 @@ import { defer } from "./utils/defer";
 export class Store<S> implements IStore<S> {
   private chain = new Chain();
 
+  /**
+   * Constructs a Store with the given initial state and dispatch function.
+   *
+   * @param state initial state
+   * @param dispatch function called whenever a React component emits an Action using `dispatch()`
+   */
   constructor(public state: S, public dispatch: (action: IAction) => void) {}
   public getState() {
     return this.state;
