@@ -127,4 +127,9 @@ export interface IStore<S> {
    * e.g. if two different handlers for an Action both wrote to the same Store.
    */
   flush(): void;
+
+  /**
+   * Dispatches an action to this store.
+   */
+  dispatch(action: IAction): void;
 }
