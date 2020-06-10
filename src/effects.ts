@@ -67,6 +67,17 @@ export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: numbe
 }
 
 /**
+ * Equivalent to `emitter.on()`, exported as an Effect for consistency.
+ *
+ * @param emitter the emitter to hook into
+ * @param type the action type to listen on
+ * @param cb a callback called whenever the action is emitted
+ */
+export function takeEvery<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
+  return emitter.on(type, cb);
+}
+
+/**
  *
  * Equivalent to `emitter.put()`, exported as an Effect for consistency.
  *
