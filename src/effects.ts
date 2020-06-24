@@ -1,5 +1,7 @@
 import { IAction, IActionType, IEmitter } from "./types";
 
+const TRUE_PREDICATE = () => true;
+
 /**
  * Equivalent to `emitter.on()`, exported as an Effect for consistency.
  *
@@ -52,17 +54,50 @@ export function take<T>(
   type: IActionType<T>,
   maxWait: number,
 ): Promise<T | null>;
-export function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait?: number) {
-  return new Promise<T | null>((resolve) => {
-    const unsubscribe = once(emitter, type, (value) => {
-      if (handle !== 0) {
-        clearTimeout(handle);
-      }
 
-      resolve(value);
+/**
+ * Returns a promise whose resolved value will be the next action of the given type
+ * emitted on the emitter. If the `maxWait` parameter is specified, then at most
+ * `maxWait` milliseconds will be waited before returning the default value `null`.
+ *
+ * @param emitter emitter to hook into
+ * @param type the action type to listen on
+ * @param maxWait the maximum time, in millis, to wait for the given action type
+ */
+export function take<T>(
+  emitter: IEmitter,
+  type: IActionType<T>,
+  filter: (payload: T) => boolean,
+  maxWait: number,
+): Promise<T | null>;
+
+export function take<T>(
+  emitter: IEmitter,
+  type: IActionType<T>,
+  arg2?: number | Function, // tslint:disable-line:ban-types
+  arg3?: number,
+) {
+  const filter = typeof arg2 === "function" ? arg2 : TRUE_PREDICATE;
+  const maxWait = typeof arg2 === "number" ? arg2 : arg3;
+
+  return new Promise<T | null>((resolve) => {
+    const unsubscribe = emitter.on(type, (value: T) => {
+      if (filter(value)) {
+        if (timeout !== 0) {
+          clearTimeout(timeout);
+        }
+
+        resolve(value);
+      }
     });
 
-    const handle = maxWait !== undefined ? setTimeout(unsubscribe, maxWait) : 0;
+    const timeout =
+      maxWait !== undefined
+        ? setTimeout(() => {
+            unsubscribe();
+            resolve(null);
+          }, maxWait)
+        : 0;
   });
 }
 
