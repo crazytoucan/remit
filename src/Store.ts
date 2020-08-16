@@ -2,6 +2,10 @@ import { IAction, IStore } from "./types";
 import { Chain } from "./utils/Chain";
 import { defer } from "./utils/defer";
 
+function noop() {
+  // noop
+}
+
 export class Store<S> implements IStore<S> {
   private chain = new Chain();
 
@@ -11,7 +15,12 @@ export class Store<S> implements IStore<S> {
    * @param state initial state
    * @param dispatch function called whenever a React component emits an Action using `dispatch()`
    */
-  constructor(public state: S, public dispatch: (action: IAction) => void) {}
+  constructor(
+    public state: S,
+    public dispatch: (action: IAction) => void = noop,
+    private afterFlush = noop,
+  ) {}
+
   public getState() {
     return this.state;
   }
@@ -34,5 +43,6 @@ export class Store<S> implements IStore<S> {
 
   private notifySubscribers = defer(() => {
     this.chain.emit(undefined);
+    this.afterFlush();
   });
 }
