@@ -41,6 +41,11 @@ export class Chain {
       }
     }
     this.dispatching = false;
+
+    if (this.nextChain !== null) {
+      this.chain = this.nextChain;
+      this.nextChain = null;
+    }
   }
 
   public add(handler: IHandler) {
