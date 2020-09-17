@@ -133,3 +133,15 @@ export interface IStore<S> {
    */
   dispatch(action: IAction): void;
 }
+
+export interface IJobMonitor {
+  readonly stopped: boolean;
+  onKill(cb: () => void): () => void;
+  onCleanup(cb: () => void): () => void;
+  finish(): void;
+}
+
+export interface IJobHandle {
+  readonly stopped: boolean;
+  kill(): void;
+}

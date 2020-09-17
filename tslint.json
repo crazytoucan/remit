@@ -6,6 +6,7 @@
   "rules": {
     "callable-types": false,
     "prefer-for-of": false,
-    "member-access": true
+    "member-access": true,
+    "unified-signatures": false
   }
 }
