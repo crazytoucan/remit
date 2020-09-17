@@ -1,4 +1,4 @@
-[![](https://img.shields.io/circleci/build/github/crazytoucan/tinysaga)](https://app.circleci.com/pipelines/github/crazytoucan/tinysaga?branch=master)
+[![](https://img.shields.io/circleci/build/github/crazytoucan/tinysaga)](https://app.circleci.com/pipelines/github/crazytoucan/tinysaga?branch=develop)
 [![](https://img.shields.io/npm/v/tinysaga)](https://www.npmjs.com/package/tinysaga)
 
 # tinysaga
