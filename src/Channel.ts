@@ -1,5 +1,5 @@
 import { IAction, IActionType, IChannel } from "./types";
-import { Chain } from "./utils/Chain";
+import { ListenerList } from "./utils/Chain";
 
 interface IDispatchNode {
   type: string;
@@ -8,9 +8,10 @@ interface IDispatchNode {
 }
 
 export class Channel implements IChannel {
-  private chains = new Map<string, Chain>();
+  private chains = new Map<string, ListenerList>();
   private end: IDispatchNode | null = null;
 
+  constructor(private
   public put(action: IAction) {
     const next: IDispatchNode = { type: action.type, payload: action.payload, next: null };
     if (this.end !== null) {
@@ -24,7 +25,7 @@ export class Channel implements IChannel {
   public on<T>(type: IActionType<T>, handler: (payload: T) => void) {
     let chain = this.chains.get(type);
     if (chain === undefined) {
-      chain = new Chain();
+      chain = new ListenerList();
       this.chains.set(type, chain);
     }
 

@@ -1,75 +1,67 @@
-interface IHandler {
-  (payload: any): void;
+import { pull } from "./collectionUtils";
+
+class Entry {
+  public destroyed = false;
+  constructor(public cb: (payload: unknown) => void) {}
 }
 
-function pull<T>(arr: T[], value: T) {
-  const idx = arr.indexOf(value);
-  if (idx !== -1) {
-    arr.splice(idx, 1);
-  }
-}
-
-function noop(_payload: any) {
-  // empty
-}
-
-function setWhere<T>(arr: T[], value: T, nextValue: T) {
-  const idx = arr.indexOf(value);
-  if (idx !== -1) {
-    arr[idx] = nextValue;
-  }
-}
-
-export class Chain {
+export class ListenerList {
   private dispatching = false;
-  private chain: IHandler[] = [];
-  private nextChain: IHandler[] | null = null;
+  private entries: Entry[] = [];
+  private nextEntries: Entry[] | null = null;
 
-  public emit(payload: any) {
+  public emit(payload: unknown) {
     if (this.dispatching) {
       throw new Error("emit() when already emitting");
     }
 
     this.dispatching = true;
-    const chain = this.chain;
+    const chain = this.entries;
     for (let i = 0; i < chain.length; i++) {
+      if (chain[i].destroyed) {
+        continue;
+      }
+
       try {
-        chain[i](payload);
+        chain[i].cb(payload);
       } catch (e) {
         // tslint:disable-next-line:no-console
         console.error(e);
       }
     }
+
     this.dispatching = false;
-
-    if (this.nextChain !== null) {
-      this.chain = this.nextChain;
-      this.nextChain = null;
+    if (this.nextEntries !== null) {
+      this.entries = this.nextEntries.filter((v) => v !== null) as Entry[];
+      this.nextEntries = null;
     }
   }
 
-  public add(handler: IHandler) {
+  public add(cb: (payload: unknown) => void) {
+    const entry = new Entry(cb);
     if (this.dispatching) {
-      if (this.nextChain === null) {
-        this.nextChain = [...this.chain, handler];
+      if (this.nextEntries === null) {
+        this.nextEntries = [...this.entries, entry];
       } else {
-        this.nextChain.push(handler);
+        this.nextEntries.push(entry);
       }
     } else {
-      this.chain.push(handler);
+      this.entries.push(entry);
     }
+
+    return () => this.destroy(entry);
   }
 
-  public remove(handler: IHandler) {
+  private destroy(entry: Entry) {
+    entry.destroyed = true;
     if (this.dispatching) {
-      if (this.nextChain === null) {
-        this.nextChain = [...this.chain];
+      if (this.nextEntries === null) {
+        this.nextEntries = [...this.entries];
       }
 
-      pull(this.nextChain, handler);
-      setWhere(this.chain, handler, noop);
+      pull(this.nextEntries, entry);
     } else {
-      pull(this.chain, handler);
+      pull(this.entries, entry);
     }
   }
 }

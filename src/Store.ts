@@ -1,13 +1,10 @@
 import { IAction, IStore } from "./types";
-import { Chain } from "./utils/Chain";
+import { ListenerList } from "./utils/Chain";
 import { defer } from "./utils/defer";
-
-function noop() {
-  // noop
-}
+import { noop } from "./utils/noop";
 
 export class Store<S> implements IStore<S> {
-  private chain = new Chain();
+  private chain = new ListenerList();
 
   /**
    * Constructs a Store with the given initial state and dispatch function.
@@ -15,11 +12,7 @@ export class Store<S> implements IStore<S> {
    * @param state initial state
    * @param dispatch function called whenever a React component emits an Action using `dispatch()`
    */
-  constructor(
-    public state: S,
-    public dispatch: (action: IAction) => void = noop,
-    private afterFlush = noop,
-  ) {}
+  constructor(public state: S, public dispatch: (action: IAction) => void = noop) {}
 
   public getState() {
     return this.state;
@@ -42,7 +35,6 @@ export class Store<S> implements IStore<S> {
   }
 
   private notifySubscribers = defer(() => {
-    this.chain.emit(undefined);
-    this.afterFlush();
+    this.chain.emit();
   });
 }
