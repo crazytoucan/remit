@@ -18,10 +18,15 @@
     "lib"
   ],
   "devDependencies": {
+    "@types/react": "^16.9.49",
     "prettier": "^2.0.5",
+    "react": "^16.13.1",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.9.3"
+  },
+  "peerDependencies": {
+    "react": "16.x || 17.x"
   },
   "license": "MIT",
   "repository": {
