@@ -1,4 +1,4 @@
-import { IAction, IActionType, IEmitter } from "./types";
+import { IAction, IActionType, IChannel } from "./types";
 import { Chain } from "./utils/Chain";
 
 interface IDispatchNode {
@@ -7,7 +7,7 @@ interface IDispatchNode {
   next: IDispatchNode | null;
 }
 
-export class Emitter implements IEmitter {
+export class Channel implements IChannel {
   private chains = new Map<string, Chain>();
   private end: IDispatchNode | null = null;
 

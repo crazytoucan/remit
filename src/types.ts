@@ -67,7 +67,7 @@ export type IActionType<T> = string & {
  *
  * For constructing an emitter, use the Emitter class.
  */
-export interface IEmitter {
+export interface IChannel {
   /**
    * Emits a new Action onto this emitter. If the emitter is already notifying listeners
    * of a previous Action, this followup `action` will be added to a queue for later processing.

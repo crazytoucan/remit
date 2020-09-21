@@ -1,4 +1,4 @@
-import { IAction, IActionType, IEmitter } from "./types";
+import { IAction, IActionType, IChannel } from "./types";
 
 const TRUE_PREDICATE = () => true;
 
@@ -9,7 +9,7 @@ const TRUE_PREDICATE = () => true;
  * @param type the action type to listen on
  * @param cb a callback called whenever the action is emitted
  */
-export function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
+export function on<T>(emitter: IChannel, type: IActionType<T>, cb: (t: T) => void) {
   return emitter.on(type, cb);
 }
 
@@ -21,7 +21,7 @@ export function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => voi
  * @param type the action type to listen on
  * @param cb a callback called exactly once when the next action is emitted
  */
-export function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
+export function once<T>(emitter: IChannel, type: IActionType<T>, cb: (t: T) => void) {
   const destroy = emitter.on(type, (value: T) => {
     destroy();
     cb(value);
@@ -38,7 +38,7 @@ export function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => v
  * @param emitter emitter to hook into
  * @param type the action type to listen on
  */
-export function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>;
+export function take<T>(emitter: IChannel, type: IActionType<T>): Promise<T>;
 
 /**
  * Returns a promise whose resolved value will be the next action of the given type
@@ -50,7 +50,7 @@ export function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>;
  * @param maxWait the maximum time, in millis, to wait for the given action type
  */
 export function take<T>(
-  emitter: IEmitter,
+  emitter: IChannel,
   type: IActionType<T>,
   maxWait: number,
 ): Promise<T | null>;
@@ -65,14 +65,14 @@ export function take<T>(
  * @param maxWait the maximum time, in millis, to wait for the given action type
  */
 export function take<T>(
-  emitter: IEmitter,
+  emitter: IChannel,
   type: IActionType<T>,
   filter: (payload: T) => boolean,
   maxWait: number,
 ): Promise<T | null>;
 
 export function take<T>(
-  emitter: IEmitter,
+  emitter: IChannel,
   type: IActionType<T>,
   arg2?: number | Function, // tslint:disable-line:ban-types
   arg3?: number,
@@ -108,7 +108,7 @@ export function take<T>(
  * @param type the action type to listen on
  * @param cb a callback called whenever the action is emitted
  */
-export function takeEvery<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void) {
+export function takeEvery<T>(emitter: IChannel, type: IActionType<T>, cb: (t: T) => void) {
   return emitter.on(type, cb);
 }
 
@@ -119,6 +119,6 @@ export function takeEvery<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T)
  * @param emitter the emitter to use
  * @param action the action to emit
  */
-export function put(emitter: IEmitter, action: IAction) {
+export function put(emitter: IChannel, action: IAction) {
   emitter.put(action);
 }
