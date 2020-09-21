@@ -18,37 +18,6 @@ export interface IAction {
   payload: any;
 }
 
-/**
- * This class is a typesafe wrapper for creating Actions. Using `defineAction()`, consumers can
- * create typesafe payloads by invoking the definition as a function.
- *
- * ```
- * const LoadUser = defineAction<{ id: string }>("LoadUser");
- * // the following line is typesafe
- * dispatch(LoadUser({ id: "4" }));
- * ```
- */
-export type IActionDefinition<T> = {
-  /**
-   * The Action type string, used for registering handlers via Emitter.on()
-   */
-  TYPE: IActionType<T>;
-
-  /**
-   * Convenience TypeScript type for higher order type arithmetic
-   */
-  __payload: T;
-
-  /**
-   * Constructs an instance of this Action using the definition's `type` and this `payload`
-   */
-  (payload: T): { type: string; payload: T };
-} & (T extends undefined
-  ? {
-      (): { type: string; payload: undefined };
-    }
-  : {});
-
 export type IActionType<T> = string & {
   __payload: T;
 };
