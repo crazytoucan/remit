@@ -1,50 +1,71 @@
 import { IAction, IActionType, IChannel } from "./types";
-import { Chain } from "./utils/Chain";
+import { defer } from "./utils/defer";
+import { ListenerList } from "./utils/ListenerList";
+import { noop } from "./utils/noop";
 
-interface IDispatchNode {
-  type: string;
-  payload: any;
-  next: IDispatchNode | null;
+export interface IChannelOpts {
+  afterEmpty?: () => void;
+}
+
+class Node {
+  public next: Node | null = null;
+  constructor(public type: string, public payload: unknown) {}
+}
+
+const enum Status {
+  IDLE,
+  SCHEDULED,
+  DRAINING,
 }
 
 export class Channel implements IChannel {
-  private chains = new Map<string, Chain>();
-  private end: IDispatchNode | null = null;
+  private eventLists = new Map<string, ListenerList>();
+  private status = Status.IDLE;
+  private end: Node | null = null;
+  private afterEmpty: () => void;
+
+  constructor(opts: IChannelOpts = {}) {
+    this.afterEmpty = opts.afterEmpty ?? noop;
+  }
 
   public put(action: IAction) {
-    const next: IDispatchNode = { type: action.type, payload: action.payload, next: null };
     if (this.end !== null) {
-      this.end = this.end.next = next;
+      this.end.next = new Node(action.type, action.payload);
+      this.end = this.end.next;
     } else {
-      this.end = next;
-      this.drain();
+      this.end = new Node(action.type, action.payload);
+    }
+
+    if (this.status === Status.IDLE) {
+      this.status = Status.SCHEDULED;
+      this.drainDefer();
     }
   }
 
   public on<T>(type: IActionType<T>, handler: (payload: T) => void) {
-    let chain = this.chains.get(type);
-    if (chain === undefined) {
-      chain = new Chain();
-      this.chains.set(type, chain);
+    let list = this.eventLists.get(type);
+    if (list === undefined) {
+      list = new ListenerList();
+      this.eventLists.set(type, list);
     }
 
-    chain.add(handler);
-    return () => {
-      chain!.remove(handler);
-    };
+    return list.add(handler);
   }
 
-  private drain() {
-    let node: IDispatchNode | null = this.end;
-    while (node !== null) {
-      const chain = this.chains.get(node.type);
+  private drainDefer = defer(() => {
+    this.status = Status.DRAINING;
+    let iter = this.end;
+    while (iter !== null) {
+      const chain = this.eventLists.get(iter.type);
       if (chain !== undefined) {
-        chain.emit(node.payload);
+        chain.emit(iter.payload);
       }
 
-      node = node.next;
+      iter = iter.next;
     }
 
     this.end = null;
-  }
+    this.status = Status.IDLE;
+    this.afterEmpty();
+  });
 }
