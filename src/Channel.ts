@@ -42,6 +42,12 @@ export class Channel implements IChannel {
     }
   }
 
+  public put2(type: IActionType<void>): void;
+  public put2<T>(type: IActionType<T>, payload: T): void;
+  public put2(type: string, payload?: any) {
+    this.put({ type, payload });
+  }
+
   public on<T>(type: IActionType<T>, handler: (payload: T) => void) {
     let list = this.eventLists.get(type);
     if (list === undefined) {

@@ -46,6 +46,12 @@ export interface IChannel {
   put(action: IAction): void;
 
   /**
+   * A shortcut for put(createAction(type, payload)).
+   */
+  put2(type: IActionType<void>): void;
+  put2<T>(type: IActionType<T>, payload: T): void;
+
+  /**
    * Listens for Actions of a given Type to enter the emitter, invoking the given callback
    * with the Action's payload. Returns a cleanup function that, when called, will stop
    * notifying the handler of further Actions, similar to Store.subscribe() in Redux.
@@ -101,4 +107,9 @@ export interface IStore<S> {
    * Dispatches an action to this store.
    */
   dispatch(action: IAction): void;
+}
+
+export interface IDispatch2 {
+  (type: IActionType<void>): void;
+  <T>(type: IActionType<T>, payload: T): void;
 }
