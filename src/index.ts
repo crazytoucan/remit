@@ -4,5 +4,6 @@ export { take } from "./effects/take";
 export { takeAdvanced } from "./effects/takeAdvanced";
 export { createUseDispatch, useDispatch } from "./hooks/useDispatch";
 export { createUseSelector, useSelector } from "./hooks/useSelector";
+export { Provider } from "./Provider";
 export { Store } from "./Store";
 export { IAction, IActionType, IChannel, IStore } from "./types";
