@@ -1,10 +1,10 @@
 import { IAction, IStore } from "./types";
-import { ListenerList } from "./utils/Chain";
 import { defer } from "./utils/defer";
+import { ListenerList } from "./utils/ListenerList";
 import { noop } from "./utils/noop";
 
 export class Store<S> implements IStore<S> {
-  private chain = new ListenerList();
+  private listeners = new ListenerList();
 
   /**
    * Constructs a Store with the given initial state and dispatch function.
@@ -26,8 +26,7 @@ export class Store<S> implements IStore<S> {
   }
 
   public subscribe(cb: () => void) {
-    this.chain.add(cb);
-    return () => this.chain.remove(cb);
+    return this.listeners.add(cb);
   }
 
   public flush() {
@@ -35,6 +34,6 @@ export class Store<S> implements IStore<S> {
   }
 
   private notifySubscribers = defer(() => {
-    this.chain.emit();
+    this.listeners.emit(null);
   });
 }

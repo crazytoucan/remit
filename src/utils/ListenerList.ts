@@ -1,14 +1,14 @@
-import { pull } from "./collectionUtils";
+import { pull, replaceFirst } from "./collectionUtils";
+import { noop } from "./noop";
 
-class Entry {
-  public destroyed = false;
-  constructor(public cb: (payload: unknown) => void) {}
+interface IListener {
+  (payload: unknown): void;
 }
 
 export class ListenerList {
   private dispatching = false;
-  private entries: Entry[] = [];
-  private nextEntries: Entry[] | null = null;
+  private entries: IListener[] = [];
+  private nextEntries: IListener[] | null = null;
 
   public emit(payload: unknown) {
     if (this.dispatching) {
@@ -18,12 +18,8 @@ export class ListenerList {
     this.dispatching = true;
     const chain = this.entries;
     for (let i = 0; i < chain.length; i++) {
-      if (chain[i].destroyed) {
-        continue;
-      }
-
       try {
-        chain[i].cb(payload);
+        chain[i](payload);
       } catch (e) {
         // tslint:disable-next-line:no-console
         console.error(e);
@@ -32,36 +28,35 @@ export class ListenerList {
 
     this.dispatching = false;
     if (this.nextEntries !== null) {
-      this.entries = this.nextEntries.filter((v) => v !== null) as Entry[];
+      this.entries = this.nextEntries;
       this.nextEntries = null;
     }
   }
 
-  public add(cb: (payload: unknown) => void) {
-    const entry = new Entry(cb);
+  public add(cb: (payload: any) => void) {
     if (this.dispatching) {
       if (this.nextEntries === null) {
-        this.nextEntries = [...this.entries, entry];
+        this.nextEntries = [...this.entries, cb];
       } else {
-        this.nextEntries.push(entry);
+        this.nextEntries.push(cb);
       }
     } else {
-      this.entries.push(entry);
+      this.entries.push(cb);
     }
 
-    return () => this.destroy(entry);
+    return () => this.destroy(cb);
   }
 
-  private destroy(entry: Entry) {
-    entry.destroyed = true;
+  private destroy(cb: IListener) {
     if (this.dispatching) {
       if (this.nextEntries === null) {
         this.nextEntries = [...this.entries];
       }
 
-      pull(this.nextEntries, entry);
+      pull(this.nextEntries, cb);
+      replaceFirst(this.entries, cb, noop);
     } else {
-      pull(this.entries, entry);
+      pull(this.entries, cb);
     }
   }
 }
