@@ -3,9 +3,7 @@
 
 # tinysaga
 
-Simple state update pattern for modern React apps.
-Allows for updating both immutable state as used by React-Redux and mutable state for computationally intensive desktop applications.
-No generators.
+Simple state and logic management library for modern React apps.
 
 ## Installation
 
@@ -15,7 +13,19 @@ $ yarn add tinysaga
 
 Comes with TypeScript typings out of the box, as well as ESM support and tree shaking.
 
-## Motivation
+## Overview
+
+Tinysaga is the no-frills state management solution for modern React apps.
+Users of [Redux](https://redux.js.org/), [React Redux](https://react-redux.js.org/), and [Redux-Saga](https://redux-saga.js.org/) will be familiar with Tinysaga's constructs and ideas.
+
+Out of the box, Tinysaga includes the following pieces:
+
+* A `Store` class which allows the user to update state and subscribe to changes. Its view-facing API is identical to that of Redux.
+* React integration via a Store `<Provider>` and familiar `useDispatch()` and `useSelector()` hooks.
+* Logic handling infrastructure via familiar `Channel` and `put()`/`on()` patterns.
+* Builtin strong Action typing on all of the above to make dispatching and handling actions more fluent in TypeScript.
+
+## Comparison to Redux-Saga
 
 Redux-Saga is a great library which allows applications to manage the complex state updates and side effects that happen in many React-Redux applications. It is a crucial part of the current frontend software stack.
 
@@ -26,127 +36,9 @@ However, the library itself is quite complex, which can cause problems in the fo
 3. The syntax itself can be challenging and unfamiliar, such as `yield` and `yield*`, or why you would want to `yield take` inside of a `while (true)` loop.
 4. The code can be very hard to debug, especially in modern compile-to-ES6 toolchains where the generators become obfuscated. Stepping through code can be a chore, and profiling code through many layers of effect realization can be a nightmare.
 
-Tinysaga supports most of the common `put()`, `takeEvery()`, and `take()` workflows from Redux-Saga, leaving only the most complex uses (like debouncing, throttling, and cancellation) to other sophisticated libraries using plain old JavaScript.
+Tinysaga supports most of the common `put()` and `on()` workflows, along with `take()` and `takeAdvanced()` sugar, without necessitating generators through your codebase.
+This allows the programmer to implement his or her logic through the tried-and-true event bus architecture, with the help of well-understood plain JavaScript utilities like Lodash for debouncing, throttling, and cancellation, without opening your organization up to the long-term tooling and execution risk that comes with newer technologies like generators.
 
-## Design
+## License
 
-At its core, Tinysaga is really just an event bus that integrates into React-Redux.
-
-- Dispatched Actions from React-Redux (or from other external sources, like a WebSocket or ticking timer) are sent to the Tinysaga `Emitter`.
-- The `Emitter` is wired up with handlers for each Action `type` in your application. Those handlers are free to do whatever they want, such as reducing a Store's state, changing any mutable state you have, or dispatching other actions.
-
-There are a set of helpful Effects that Tinysaga exports, such as `take()` and `once()` which allow you to compose the low-level Emitter primitive into more powerful constructs. No generators involved.
-
-## API
-
-```ts
-// Utility function for defining typesafe actions.
-function defineAction<T = undefined>(type: string): IActionDefinition<T>;
-
-// The core Emitter type to use with Tinysaga for handling actions.
-class Emitter {
-  put(action: IAction): void;
-  on<T>(type: IActionType<T>, handler: (payload: T) => void): () => void;
-}
-
-// A Store class to use with Tinysaga. No redux or reducers required --
-// just set the Store's state directly from your Tinysaga handlers.
-class Store<S> implements IStore<S> {
-  constructor(state: S, dispatch: (action: IAction) => void);
-
-  readonly state: S;
-  setState(nextState: S): void;
-  getState(): S;
-  dispatch(action: IAction): void
-  subscribe(cb: () => void): () => void;
-  flush(): void;
-}
-
-// Effects to use for convenience in Tinysaga handlers.
-function on<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void): () => void;
-function once<T>(emitter: IEmitter, type: IActionType<T>, cb: (t: T) => void): () => void;
-function take<T>(emitter: IEmitter, type: IActionType<T>): Promise<T>
-function take<T>(emitter: IEmitter, type: IActionType<T>, maxWait: number): Promise<T | null>;
-function put(emitter: IEmitter, action: IAction): void;
-```
-
-## Examples
-
-### Making a network call
-
-```ts
-const FetchUser = defineAction<{ userId: string }>("FetchUser");
-const FetchUserSuccess = defineAction<{ data: IUserData }>("FetchUserSuccess");
-const FetchUserFailed = defineAction<{ message: string }>("FetchUserFailed");
-
-on(emitter, FetchUser.TYPE, async ({ userId }) => {
-  // Note: `userId` and all of these calls are type-aware! No saga ReturnType shenanigans
-  try {
-    const data = await Api.fetchUser(userId);
-    put(emitter, FetchUserSuccess({ data }));
-  } catch (e) {
-    put(emitter, FetchUserFailed({ message: e.message }));
-  }
-});
-```
-
-### Closing a popover unless the user mouses into it or its anchor
-
-This snippet shows how multiple action types can be combined to implement complex behavior. Here we use `lodash.debounce()` for most of the heavy lifting.
-
-```ts
-const DismissPopover = defineAction("DismissPopover");
-const PopoverAnchorEnter = defineAction("PopoverAnchorEnter");
-const PopoverEnter = defineAction("PopoverEnter");
-
-function popoverHandler(emitter: IEmitter) {
-  const debouncedHide = lodash.debounce(() => {
-    store.setState({ ...store.state, popover: undefined });
-  }, 500);
-
-  on(emitter, DismissPopover.TYPE, () => {
-    debouncedHide();
-  });
-
-  on(emitter, PopoverAnchorEnter.TYPE, () => {
-    debouncedHide.cancel();
-  });
-
-  on(emitter, PopoverEnter.TYPE, () => {
-    debouncedHide.cancel();
-  });
-}
-```
-
-For comparison, equivalent Redux-Saga code is something like:
-
-```ts
-const DismissPopover = defineAction("DismissPopover");
-const PopoverAnchorEnter = defineAction("PopoverAnchorEnter");
-const PopoverEnter = defineAction("PopoverEnter");
-
-function* popoverSaga() {
-  yield fork(function* () {
-    while (true) {
-      yield takeLatest(DismissPopover.TYPE, function* () {
-        const { pass } = yield race({
-          anchorEnter: take(PopoverAnchorEnter.TYPE),
-          enter: take(PopoverEnter.TYPE),
-          pass: delay(500),
-        });
-
-        if (pass) {
-          yield put(DismissPopoverInternal()); // goes off to a reducer somewhere
-        }
-      };
-    }
-  });
-}
-```
-
-## Contributing
-
-Contributions are definitely welcome!
-
-This is still an early-stage project,
-so the most likely next major investment will be a documentation site.
+MIT
