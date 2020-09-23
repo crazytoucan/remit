@@ -18,8 +18,8 @@ export interface IAction {
   payload: any;
 }
 
-export type IActionType<T> = string & {
-  __payload: T;
+export type IActionType<TPAYLOAD> = string & {
+  __TPAYLOAD: TPAYLOAD;
 };
 
 /**
