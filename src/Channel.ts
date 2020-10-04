@@ -21,7 +21,8 @@ const enum Status {
 export class Channel implements IChannel {
   private eventLists = new Map<string, ListenerList>();
   private status = Status.IDLE;
-  private end: Node | null = null;
+  private front = new Node("", null);
+  private end = this.front;
   private afterEmpty: () => void;
 
   constructor(opts: IChannelOpts = {}) {
@@ -29,13 +30,7 @@ export class Channel implements IChannel {
   }
 
   public put(action: IAction) {
-    if (this.end !== null) {
-      this.end.next = new Node(action.type, action.payload);
-      this.end = this.end.next;
-    } else {
-      this.end = new Node(action.type, action.payload);
-    }
-
+    this.end = this.end.next = new Node(action.type, action.payload);
     if (this.status === Status.IDLE) {
       this.status = Status.SCHEDULED;
       this.drainDefer();
@@ -60,7 +55,8 @@ export class Channel implements IChannel {
 
   private drainDefer = defer(() => {
     this.status = Status.DRAINING;
-    let iter = this.end;
+    let iter = this.front.next;
+    this.front.next = null; // release chain while we're iterating
     while (iter !== null) {
       const chain = this.eventLists.get(iter.type);
       if (chain !== undefined) {
@@ -70,7 +66,7 @@ export class Channel implements IChannel {
       iter = iter.next;
     }
 
-    this.end = null;
+    this.end = this.front;
     this.status = Status.IDLE;
     this.afterEmpty();
   });
