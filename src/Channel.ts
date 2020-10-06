@@ -53,6 +53,12 @@ export class Channel implements IChannel {
     return list.add(handler);
   }
 
+  public flush() {
+    if (this.status === Status.SCHEDULED) {
+      this.drainDefer.flush();
+    }
+  }
+
   private drainDefer = defer(() => {
     this.status = Status.DRAINING;
     let iter = this.front.next;
